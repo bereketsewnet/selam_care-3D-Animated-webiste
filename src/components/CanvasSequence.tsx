@@ -131,10 +131,9 @@ export function CanvasSequence({
         <div id={id} ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#0a0a0a] perspective-[1000px]">
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%] object-cover z-0 origin-center"
+                className="absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%] object-cover z-10 origin-center"
             />
-
-            <div className="absolute inset-0 z-10 w-full h-full">
+            <div className="absolute inset-0 z-20">
                 {children}
             </div>
         </div>
