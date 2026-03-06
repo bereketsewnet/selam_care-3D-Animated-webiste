@@ -2,11 +2,13 @@ import { useEffect, useRef } from 'react';
 
 interface StarfieldProps {
     className?: string;
+    numStars?: number;
+    maxStarSize?: number;
 }
 
 type ShootingStarType = 'comet' | 'blue-rock' | 'standard';
 
-export function Starfield({ className = '' }: StarfieldProps) {
+export function Starfield({ className = '', numStars = 150, maxStarSize = 2.0 }: StarfieldProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -34,7 +36,6 @@ export function Starfield({ className = '' }: StarfieldProps) {
 
         resizeObserver.observe(canvas.parentElement || document.body);
 
-        const NUM_STARS = 150;
         let stars: Array<{ x: number, y: number, radius: number, alpha: number, targetAlpha: number, speed: number }> = [];
 
         // --- Shooting Star Configuration ---
@@ -49,12 +50,12 @@ export function Starfield({ className = '' }: StarfieldProps) {
 
         const initStars = (width: number, height: number) => {
             stars = [];
-            for (let i = 0; i < NUM_STARS; i++) {
+            for (let i = 0; i < numStars; i++) {
                 stars.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    // Slightly larger base stars than before
-                    radius: Math.random() * 2.0 + 0.5,
+                    // Use maxStarSize prop
+                    radius: Math.random() * maxStarSize + 0.5,
                     alpha: Math.random(),
                     targetAlpha: Math.random(),
                     speed: 0.01 + Math.random() * 0.03
