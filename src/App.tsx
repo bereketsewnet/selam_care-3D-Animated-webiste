@@ -1,3 +1,4 @@
+import { Header } from './components/Header';
 import { Section1 } from './components/sections/Section1';
 import { Section2 } from './components/sections/Section2';
 import { Section3 } from './components/sections/Section3';
@@ -7,6 +8,7 @@ import { Section4 } from './components/sections/Section4';
 export default function App() {
   return (
     <main className="bg-slate-950 w-full min-h-screen text-slate-50 font-sans selection:bg-selam-cyan selection:text-white">
+      <Header />
       {/* 
         Each section contains a pinned CanvasSequence taking up 100vh 
         but scrolling 400% of its height to scrub the frames.

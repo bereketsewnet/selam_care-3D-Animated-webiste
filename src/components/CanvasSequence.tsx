@@ -9,9 +9,20 @@ interface CanvasSequenceProps {
     frameCount: number;
     id?: string;
     children?: React.ReactNode;
+    end?: string;
+    scrub?: number | boolean;
+    sequenceEndRatio?: number;
 }
 
-export function CanvasSequence({ folder, frameCount, id, children }: CanvasSequenceProps) {
+export function CanvasSequence({
+    folder,
+    frameCount,
+    id,
+    children,
+    end = '+=200%',
+    scrub = 0.5,
+    sequenceEndRatio = 1
+}: CanvasSequenceProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +57,6 @@ export function CanvasSequence({ folder, frameCount, id, children }: CanvasSeque
             img.onload = () => {
                 loadedCount++;
                 if (loadedCount === 1) {
-                    // Add a small delay for correct layout calculations before first draw
                     setTimeout(() => {
                         canvas.width = window.innerWidth;
                         canvas.height = window.innerHeight;
@@ -57,24 +67,31 @@ export function CanvasSequence({ folder, frameCount, id, children }: CanvasSeque
             frames.push(img);
         }
 
-        // Wait for the next tick to ensure DOM is ready
         let ctx = gsap.context(() => {
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: container,
                     start: 'top top',
-                    end: '+=400%', // Gives plenty of scroll space (pin duration)
-                    scrub: 0.5,
+                    end: end,
+                    scrub: scrub,
                     pin: true,
                 }
             });
 
+            // The frames animate over a fraction of the total pin distance
             tl.to(animation, {
                 frame: frameCount - 1,
                 snap: 'frame',
                 ease: 'none',
+                duration: sequenceEndRatio,
                 onUpdate: () => render(Math.round(animation.frame))
             });
+
+            // If sequenceEndRatio is less than 1, add dead space at the end 
+            // so the section stays pinned while the frame stays on the last one.
+            if (sequenceEndRatio < 1) {
+                tl.to({}, { duration: 1 - sequenceEndRatio });
+            }
         });
 
         const handleResize = () => {
@@ -83,22 +100,40 @@ export function CanvasSequence({ folder, frameCount, id, children }: CanvasSeque
             render(Math.round(animation.frame));
         };
 
+        const handleMouseMove = (e: MouseEvent) => {
+            // Subtle parallax effect on the canvas based on mouse position
+            if (window.scrollY > window.innerHeight) return; // Only apply when at top
+
+            const xPos = (e.clientX / window.innerWidth - 0.5) * 20; // -10px to 10px
+            const yPos = (e.clientY / window.innerHeight - 0.5) * 20; // -10px to 10px
+
+            gsap.to(canvas, {
+                x: xPos,
+                y: yPos,
+                rotationY: xPos * 0.1,
+                rotationX: -yPos * 0.1,
+                ease: "power2.out",
+                duration: 1
+            });
+        };
+
         window.addEventListener('resize', handleResize);
+        window.addEventListener('mousemove', handleMouseMove);
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            window.removeEventListener('mousemove', handleMouseMove);
             ctx.revert();
         };
-    }, [folder, frameCount]);
+    }, [folder, frameCount, end, scrub, sequenceEndRatio]);
 
     return (
-        <div id={id} ref={containerRef} className="relative w-full h-screen overflow-hidden bg-selam-dark">
+        <div id={id} ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#0a0a0a] perspective-[1000px]">
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className="absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%] object-cover z-0 origin-center"
             />
 
-            {/* Absolute positioning wrapper for children so they sit on top of the pinned canvas */}
             <div className="absolute inset-0 z-10 w-full h-full">
                 {children}
             </div>
