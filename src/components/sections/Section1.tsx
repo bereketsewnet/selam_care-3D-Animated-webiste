@@ -22,6 +22,7 @@ export function Section1() {
             gsap.set(".genesis-text > *", { y: 20, opacity: 0, filter: 'blur(5px)' });
             gsap.set(".start-button", { opacity: 0, scale: 0.9, y: 10 });
             gsap.set(".cross-reveal-content > *", { opacity: 0 }); // Ensure hidden on load
+            gsap.set(".get-started-overlay", { autoAlpha: 0 }); // Hide clickable overlay on load
 
             // Animate globe in — no scale change so it always fills 100% height
             gsap.to(
@@ -79,16 +80,11 @@ export function Section1() {
                 duration: 0.2,
             }, 0);
 
-            // Fade out the starfield
-            tl.to(".starfield-wrapper", {
-                opacity: 0,
-                duration: 0.5,
-                ease: "power1.inOut"
-            }, 0);
+            // (Starfield stays visible throughout)
 
-            // Slide canvas to the LEFT — no scale so it fills 100% height top-to-bottom, mirroring the first frame
+            // Keep canvas centered on the end frame — no shift so nothing gets clipped
             tl.to("#section-1 canvas:not(.starfield-canvas)", {
-                xPercent: -25, // Mirror the +25 from the start — same proportion, opposite side
+                xPercent: -20,  // Center — text on the right floats over the dark portion naturally
                 duration: 1,
                 ease: "power2.inOut"
             }, 0);
@@ -124,6 +120,9 @@ export function Section1() {
                 ease: "power2.out"
             }, 0.5); // Starts halfway through the scrub
 
+            // Enable the baked Get Started button link
+            tl.set(".get-started-overlay", { autoAlpha: 1 }, 0.8); // Enable clicking near the end
+
         }, containerRef);
 
         return () => ctx.revert();
@@ -144,24 +143,51 @@ export function Section1() {
                     <Starfield className="starfield-canvas opacity-70" />
                 </div>
 
-                {/* END FRAME UI - Initially hidden, fades in at the end of scroll on the right side */}
-                <div className="absolute inset-0 flex flex-col justify-center items-end px-8 md:px-24 pt-20 pointer-events-none z-30">
-                    <div className="cross-reveal-content text-left max-w-lg lg:max-w-xl w-full">
-                        <p className="text-selam-cyan uppercase tracking-[0.2em] text-sm md:text-base font-bold mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-                            The Next Evolution
-                        </p>
-                        <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] leading-[1.1] tracking-tight">
-                            The Center of<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-selam-cyan to-white">Modern Healthcare.</span>
-                        </h2>
-                        <p className="text-lg md:text-xl text-slate-200 mt-4 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)] font-light leading-relaxed mb-10">
-                            Unifying patient records, real-time telehealth, and intelligent diagnostics securely in one trusted nucleus. Discover the future of clinic operations and seamless care experiences.
+                {/* INVISIBLE CLICKABLE OVERLAY FOR "GET STARTED" BAKED BUTTON */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+                    <a
+                        href="https://selamcare.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="get-started-overlay pointer-events-auto w-[65vw] max-w-[450px] h-[15vh] max-h-[120px] rounded-[3rem] cursor-pointer"
+                        title="Get Started on SelamCare"
+                        aria-label="Get Started with SelamCare"
+                    />
+                </div>
+
+                {/* END FRAME UI — full-height right column, pure typographic layout, no card */}
+                {/* Right-edge dark gradient for text readability — mirrors the natural dark space on the left in frame 1 */}
+                <div className="absolute inset-0 pointer-events-none z-30">
+                    {/* Subtle dark gradient on the right 45% to create a natural reading zone */}
+                    <div className="absolute top-0 right-0 w-[30%] h-full bg-gradient-to-l from-black/70 via-black/30 to-transparent" />
+                </div>
+
+                <div className="absolute top-0 right-0 w-[30%] h-full flex flex-col justify-center items-center px-6 lg:px-12 pointer-events-none z-30">
+                    <div className="cross-reveal-content text-left w-full max-w-sm xl:max-w-md space-y-6">
+                        {/* Kicker */}
+                        <p className="text-selam-cyan uppercase tracking-[0.25em] text-xs font-bold">
+                            The Next Evolution in Care
                         </p>
 
-                        {/* Adding subtle decorative element to end frame */}
-                        <div className="flex items-center gap-4 text-sm font-medium text-slate-400">
-                            <span className="w-12 h-px bg-slate-500"></span>
-                            Scroll to proceed
+                        {/* Main headline — large, bold, edge-to-edge of the right column */}
+                        <h2 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tighter mb-8">
+                            The Center<br />
+                            of Modern<br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-selam-cyan to-white">Healthcare.</span>
+                        </h2>
+
+                        {/* Thin horizontal rule — editorial style separator */}
+                        <div className="w-12 h-px bg-selam-cyan/60" />
+
+                        {/* Body text */}
+                        <p className="text-slate-300 text-sm md:text-base font-light leading-relaxed max-w-xs">
+                            Unifying patient records, real-time telehealth, and intelligent diagnostics — all in one trusted, beautiful platform.
+                        </p>
+
+                        {/* Bottom label */}
+                        <div className="flex items-center gap-3 text-xs font-medium text-slate-500 uppercase tracking-widest pt-2">
+                            <span className="w-6 h-px bg-slate-600" />
+                            Scroll to continue
                         </div>
                     </div>
                 </div>
