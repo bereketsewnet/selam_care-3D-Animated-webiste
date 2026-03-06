@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { CanvasSequence } from '../CanvasSequence';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import { Starfield } from '../Starfield';
 
 export function Section1() {
@@ -23,6 +23,7 @@ export function Section1() {
             gsap.set(".start-button", { opacity: 0, scale: 0.9, y: 10 });
             gsap.set(".cross-reveal-content > *", { opacity: 0 }); // Ensure hidden on load
             gsap.set(".get-started-overlay", { autoAlpha: 0 }); // Hide clickable overlay on load
+            gsap.set(".stats-widget", { y: 30, opacity: 0, scale: 0.95 }); // Floating stats widget initial state
 
             // Animate globe in — no scale change so it always fills 100% height
             gsap.to(
@@ -48,6 +49,25 @@ export function Section1() {
                 duration: 1,
                 delay: 0.8,
                 ease: "back.out(2)"
+            });
+
+            gsap.to(".stats-widget", {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 1,
+                delay: 1.2,
+                ease: "back.out(1.5)",
+                onComplete: () => {
+                    // Float up and down forever after appearing
+                    gsap.to(".stats-widget", {
+                        y: -12,
+                        duration: 2.2,
+                        ease: "sine.inOut",
+                        repeat: -1,
+                        yoyo: true,
+                    });
+                }
             });
 
             gsap.fromTo(
@@ -104,6 +124,14 @@ export function Section1() {
                 opacity: 0,
                 duration: 0.4,
                 ease: "back.in(2)"
+            }, 0);
+
+            tl.to(".stats-widget", {
+                opacity: 0,
+                y: 20,
+                scale: 0.9,
+                duration: 0.4,
+                ease: "power2.in"
             }, 0);
 
             // Animate END frame content IN
@@ -211,16 +239,90 @@ export function Section1() {
                         </p>
 
                         <div className="pointer-events-auto start-button">
-                            <button className="glass-button flex items-center gap-3 text-white group outline-none overflow-hidden relative shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-selam-cyan/30">
-                                <span className="relative z-10 font-bold tracking-wide">Get Started</span>
-                                <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+                            <button className="cta-button group">
+                                {/* Orbiting glow dot */}
+                                <span className="orbit-dot" />
 
-                                <div className="absolute inset-0 bg-gradient-to-r from-selam-cyan/0 via-selam-cyan/40 to-selam-cyan/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                {/* Button label */}
+                                <span className="relative z-10 font-bold tracking-widest text-sm uppercase">
+                                    Get Started
+                                </span>
+
+                                {/* Arrow with animated slide-right on hover */}
+                                <span className="relative z-10 flex items-center overflow-hidden w-5">
+                                    <ArrowRight
+                                        size={18}
+                                        className="shrink-0 transition-all duration-300 group-hover:translate-x-5 group-hover:opacity-0"
+                                    />
+                                    <ArrowRight
+                                        size={18}
+                                        className="shrink-0 absolute -left-5 transition-all duration-300 group-hover:translate-x-5 group-hover:opacity-100 opacity-0 text-selam-cyan"
+                                    />
+                                </span>
                             </button>
                         </div>
                     </div>
 
                 </div>
+
+                {/* GLOBE AREA MINI BADGE — top of globe, where green box was drawn */}
+                <div className="stats-widget absolute top-[18%] right-[28%] z-30 pointer-events-none">
+                    <div className="stats-card-border">
+                        <div className="flex items-center gap-2 px-3 py-2" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(16px)', borderRadius: 'calc(1rem - 1px)' }}>
+                            <div className="relative w-6 h-6 rounded-full bg-white/20 border border-white/30 flex items-center justify-center shrink-0">
+                                <span className="text-selam-cyan font-bold text-xs">+</span>
+                                <div className="icon-pulse absolute inset-0 rounded-full" />
+                            </div>
+                            <div>
+                                <div className="text-white text-[10px] font-bold leading-tight">Real-time Care</div>
+                                <div className="text-slate-400 text-[9px] uppercase tracking-widest">SelamCare Platform</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* FLOATING STATS WIDGET — bottom-right, under globe — premium animated card */}
+                <div className="stats-widget absolute bottom-16 right-10 z-30 pointer-events-none w-52 lg:w-56">
+                    <div className="stats-card-border">
+                        <div className="stats-card-inner">
+                            {/* Snow particles */}
+                            {[...Array(5)].map((_, i) => (
+                                <span
+                                    key={i}
+                                    className="snow-particle"
+                                    style={{
+                                        left: `${15 + i * 18}%`,
+                                        bottom: '10%',
+                                        animationDuration: `${2.5 + i * 0.6}s`,
+                                        animationDelay: `${i * 0.4}s`,
+                                        width: i % 2 === 0 ? '3px' : '2px',
+                                        height: i % 2 === 0 ? '3px' : '2px',
+                                    }}
+                                />
+                            ))}
+
+                            {/* Icon bubble — white/transparent, no solid blue */}
+                            <div className="absolute -top-5 left-4 w-11 h-11 shrink-0">
+                                <div className="relative w-full h-full rounded-full bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                                    <Users size={18} className="text-white" />
+                                    {/* Pulsing ring */}
+                                    <div className="icon-pulse absolute inset-0 rounded-full" />
+                                </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="text-left">
+                                <div className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-1 leading-none">
+                                    10k<span className="text-selam-cyan">+</span>
+                                </div>
+                                <div className="text-[10px] lg:text-xs font-semibold text-slate-300 uppercase tracking-widest leading-relaxed">
+                                    Active Patients<br />&amp; Doctors
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 {/* Scroll Indicator */}
                 <div

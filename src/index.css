@@ -15,3 +15,177 @@
 .glass-button {
   @apply bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 px-8 py-3 rounded-full transition-all duration-300 font-semibold tracking-wide;
 }
+
+/* Premium CTA button animations */
+@keyframes btn-glow-orbit {
+  0% {
+    transform: rotate(0deg) translateX(52px) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) translateX(52px) scale(1.4);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(52px) scale(1);
+  }
+}
+
+@keyframes btn-shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+@keyframes btn-pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px 2px rgba(0, 220, 255, 0.25), 0 0 0 0 rgba(0, 220, 255, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 35px 6px rgba(0, 220, 255, 0.45), 0 0 0 8px rgba(0, 220, 255, 0);
+  }
+}
+
+.cta-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(0, 220, 255, 0.08));
+  backdrop-filter: blur(12px);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  animation: btn-pulse-glow 3s ease-in-out infinite;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  transform: translateX(-150%) skewX(-20deg);
+  animation: btn-shimmer 3.5s ease-in-out infinite;
+}
+
+.cta-button:hover {
+  transform: scale(1.04) translateY(-1px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(0, 220, 255, 0.18));
+}
+
+/* Orbiting glow dot */
+.cta-button .orbit-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0, 220, 255, 0.9);
+  box-shadow: 0 0 12px 4px rgba(0, 220, 255, 0.6);
+  top: 50%;
+  left: 50%;
+  margin: -4px;
+  animation: btn-glow-orbit 3s linear infinite;
+  pointer-events: none;
+}
+
+/* Animated border for stats widget */
+@keyframes border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  70% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(-80px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.stats-card-border {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(0, 220, 255, 0.35), rgba(255, 255, 255, 0.1), rgba(0, 150, 200, 0.3));
+  background-size: 300% 300%;
+  animation: border-flow 4s ease infinite;
+  padding: 1px;
+  border-radius: 1rem;
+}
+
+.stats-card-inner {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: calc(1rem - 1px);
+  padding: 1.25rem;
+  padding-top: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Icon ring pulse */
+.icon-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* Snow particles */
+.snow-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  animation: snowfall linear infinite;
+  pointer-events: none;
+}
