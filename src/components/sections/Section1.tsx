@@ -97,26 +97,31 @@ export function Section1() {
                     <Starfield className="starfield-canvas opacity-70" />
                 </div>
 
-                <div className="w-full h-full flex flex-col justify-center px-8 md:px-24 pt-20">
+                <div className="w-full h-full flex flex-col justify-center px-8 md:px-24 pt-20 relative">
+                    {/* Subtle vignette behind text for legibility without a harsh box */}
+                    <div className="absolute top-0 left-0 w-full md:w-[60%] h-full bg-[radial-gradient(ellipse_at_left_center,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0)_60%)] pointer-events-none z-10" />
 
                     <div className="max-w-xl z-20 genesis-text pointer-events-none mt-10 lg:mt-0">
 
-                        <p className="text-selam-cyan uppercase tracking-[0.2em] text-sm md:text-base font-bold mb-4">
+                        <p className="text-selam-cyan uppercase tracking-[0.2em] text-sm md:text-base font-bold mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
                             Introducing the new standard in care.
                         </p>
 
-                        <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tighter mb-8 drop-shadow-2xl">
+                        <h1
+                            className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tighter mb-8"
+                            style={{ filter: "drop-shadow(0px 10px 20px rgba(0,0,0,0.7)) drop-shadow(0px 4px 10px rgba(0,0,0,0.9))" }}
+                        >
                             Intelligent Care.<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-selam-cyan to-white">Real-time Connection.</span>
                         </h1>
 
-                        <p className="text-lg text-slate-300 md:text-xl leading-relaxed mb-12 max-w-lg font-light shadow-black/50 drop-shadow-md">
+                        <p className="text-lg text-slate-100 md:text-xl leading-relaxed mb-12 max-w-lg font-medium drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)]">
                             A completely reimagined ecosystem for doctors and patients. Experience seamless clinic management, integrated video conferencing, and instant chat—all in one beautiful platform.
                         </p>
 
                         <div className="pointer-events-auto start-button">
                             {/* This button places itself "over the top" of the 3D rendered button at the end */}
-                            <button className="glass-button flex items-center gap-3 text-white group outline-none overflow-hidden relative shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-selam-cyan/30">
+                            <button className="glass-button flex items-center gap-3 text-white group outline-none overflow-hidden relative shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-selam-cyan/30 bg-white/5 backdrop-blur-md border border-white/20">
                                 <span className="relative z-10 font-bold tracking-wide">Get Started</span>
                                 <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
 
