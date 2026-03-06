@@ -12,6 +12,7 @@ interface CanvasSequenceProps {
     end?: string;
     scrub?: number | boolean;
     sequenceEndRatio?: number;
+    sequenceStartRatio?: number; // dead time at the START before frames begin
 }
 
 export function CanvasSequence({
@@ -21,7 +22,8 @@ export function CanvasSequence({
     children,
     end = '+=200%',
     scrub = 0.5,
-    sequenceEndRatio = 1
+    sequenceEndRatio = 1,
+    sequenceStartRatio = 0,
 }: CanvasSequenceProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -78,6 +80,11 @@ export function CanvasSequence({
                 }
             });
 
+            // Leading dead time — canvas frozen on frame 0 while transition plays
+            if (sequenceStartRatio > 0) {
+                tl.to({}, { duration: sequenceStartRatio });
+            }
+
             // The frames animate over a fraction of the total pin distance
             tl.to(animation, {
                 frame: frameCount - 1,
@@ -90,7 +97,7 @@ export function CanvasSequence({
             // If sequenceEndRatio is less than 1, add dead space at the end 
             // so the section stays pinned while the frame stays on the last one.
             if (sequenceEndRatio < 1) {
-                tl.to({}, { duration: 1 - sequenceEndRatio });
+                tl.to({}, { duration: 1 - sequenceEndRatio - sequenceStartRatio });
             }
         });
 
