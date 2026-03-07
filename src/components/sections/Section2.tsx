@@ -34,7 +34,7 @@ export function Section2() {
             gsap.set(overlayRef.current, { clipPath: 'inset(0% 0px 0px 0px)', background: '#030c18' });
             gsap.set(preludeRef.current, { opacity: 1 });
             gsap.set(scanRef.current, { top: '-10px', opacity: 0 });
-            gsap.set('.section-title', { opacity: 0, x: -50, filter: 'blur(10px)' });
+            gsap.set('.section-title', { opacity: 1, y: 0 }); // starts visible
             gsap.set('.tooltip', { opacity: 0, y: 20 });
 
             const tl = gsap.timeline({
@@ -71,13 +71,33 @@ export function Section2() {
             // 4. Beam fades out
             tl.to(scanRef.current, { opacity: 0, ease: 'none', duration: 0.01 }, 0.185);
 
-            // ── SECTION CONTENT ─────────────────────────────────────
+            // ── FIX TIMELINE DURATION TO 1.0 (represents 100% scroll) ──
+            tl.to({}, { duration: 0 }, 1.0);
+
+            // ── SECTION CONTENT TEXT REVEAL ─────────────────────────
+            // Dark prelude → no box behind text (already dark bg, text is clear).
+            // White building appears → animate black blur box in behind the text.
+            // Inside blue building → animate box back out.
+
+            // As the beam sweeps (0.06): fade in the black glass box behind text
+            tl.to('.headline-box', {
+                backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(16px)',
+                ease: 'power1.inOut',
+                duration: 0.12,
+            }, 0.06);
+
+            // 30% to 70% Scroll: Main Headline fades out.
             tl.to('.section-title', {
-                opacity: 1, x: 0, filter: 'blur(0px)',
-                duration: 0.12, ease: 'power3.out'
+                opacity: 0, y: -40, filter: 'blur(10px)',
+                duration: 0.4, ease: 'power2.inOut'
             }, 0.30);
-            tl.to('.tooltip-server', { opacity: 1, y: 0, duration: 0.10, ease: 'back.out(2)' }, 0.50);
-            tl.to('.tooltip-doctors', { opacity: 1, y: 0, duration: 0.10, ease: 'back.out(2)' }, 0.65);
+
+            // 70% to 100% Scroll: Floating Feature points fade in next to glowing parts
+            tl.to('.tooltip-server', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.70);
+            tl.to('.tooltip-doctors', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.75);
+            tl.to('.tooltip-storage', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.80);
+            tl.to('.tooltip-ai', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.85);
 
         }, sectionRef);
 
@@ -137,30 +157,69 @@ export function Section2() {
                 sequenceEndRatio={0.80}
             >
                 {/* ── SECTION CONTENT ─────────────────────────────── */}
-                <div className="w-full h-full relative pointer-events-none">
-                    <div className="absolute top-32 left-8 md:left-24 section-title z-20">
-                        <h2 className="font-display text-5xl md:text-6xl font-bold tracking-tight leading-none text-white mb-6">The Infrastructure</h2>
-                        <p className="text-lg md:text-xl font-normal leading-relaxed text-selam-cyan max-w-xl">The backbone of modern clinics.</p>
-                    </div>
-                    <div className="absolute top-[50%] left-[10%] md:left-[25%] tooltip tooltip-server z-20">
-                        <div className="glass-panel px-6 py-4 flex items-center gap-4 relative isolate overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-r from-selam-cyan/10 to-transparent -z-10" />
-                            <div className="w-3 h-3 rounded-full bg-selam-cyan animate-[ping_2s_ease-in-out_infinite]" />
-                            <div className="w-3 h-3 rounded-full bg-selam-cyan absolute left-6" />
-                            <div>
-                                <p className="text-xs text-selam-cyan font-bold uppercase tracking-widest">Node Alpha</p>
-                                <p className="text-white font-medium text-lg">Secure Core Servers</p>
-                            </div>
+                <div className="w-full h-full relative pointer-events-none z-50">
+
+                    {/* Main Headline Container — no background on dark screen, black blur box added via GSAP on white building */}
+                    <div className="absolute top-1/2 -translate-y-1/2 left-6 md:left-24 section-title z-50 w-[90%] max-w-xl pointer-events-none">
+                        <div className="headline-box px-8 py-10 rounded-2xl relative" style={{ backgroundColor: 'transparent', backdropFilter: 'none' }}>
+
+                            <p className="text-sm font-bold uppercase tracking-[0.2em] text-selam-cyan mb-4">
+                                Enterprise-Grade Architecture.
+                            </p>
+
+                            <h2 className="font-display text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1] text-white mb-8">
+                                See inside your practice.<br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-selam-cyan to-white">
+                                    Built to scale.
+                                </span>
+                            </h2>
+
+                            <p className="text-lg md:text-xl font-normal leading-relaxed text-slate-300 max-w-xl">
+                                Move beyond basic records. Our robust system handles everything from patient flow to secure data management—giving you total transparency over your clinic's operations.
+                            </p>
+
                         </div>
                     </div>
-                    <div className="absolute top-[35%] right-[5%] md:right-[20%] tooltip tooltip-doctors z-20">
-                        <div className="glass-panel px-6 py-4 flex flex-col items-end gap-1 relative isolate overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-l from-blue-500/10 to-transparent -z-10" />
-                            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Active Staff</p>
-                            <div className="flex items-center gap-2">
-                                <span className="text-blue-400 font-bold text-2xl">14+</span>
-                                <span className="text-white font-medium">Specialists</span>
+
+                    {/* Feature 1: End-to-End Encryption — center-left (doctors room) */}
+                    <div className="absolute top-[50%] left-[10%] md:left-[25%] tooltip tooltip-server z-40">
+                        <div className="glass-panel px-6 py-4 flex items-center gap-4 relative isolate overflow-hidden bg-slate-900/60 backdrop-blur-lg border border-selam-cyan/30 rounded-xl shadow-2xl">
+                            <div className="absolute inset-0 bg-gradient-to-r from-selam-cyan/10 to-transparent -z-10" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-selam-cyan animate-pulse shadow-[0_0_10px_rgba(0,220,255,0.8)]" />
+                            <p className="text-white font-medium whitespace-nowrap tracking-wide">End-to-End Encryption</p>
+                        </div>
+                    </div>
+
+                    {/* Feature 2: Live Resource Tracking — upper-right */}
+                    <div className="absolute top-[20%] right-[5%] md:right-[20%] tooltip tooltip-doctors z-40">
+                        <div className="glass-panel px-6 py-4 flex items-center gap-4 relative isolate overflow-hidden bg-slate-900/60 backdrop-blur-lg border border-selam-cyan/30 rounded-xl shadow-2xl">
+                            <div className="absolute inset-0 bg-gradient-to-l from-selam-cyan/10 to-transparent -z-10" />
+                            <p className="text-white font-medium whitespace-nowrap tracking-wide">Live Resource Tracking</p>
+                            <div className="w-2.5 h-2.5 rounded-full bg-selam-cyan animate-pulse shadow-[0_0_10px_rgba(0,220,255,0.8)]" />
+                        </div>
+                    </div>
+
+                    {/* Feature 3: HIPAA-Compliant Storage — bottom-right, near server racks */}
+                    <div className="absolute bottom-[12%] right-[4%] md:right-[12%] tooltip tooltip-storage z-40">
+                        <div className="glass-panel px-6 py-4 flex items-center gap-4 relative isolate overflow-hidden bg-slate-900/60 backdrop-blur-lg border border-selam-cyan/30 rounded-xl shadow-2xl">
+                            <div className="absolute inset-0 bg-gradient-to-l from-selam-cyan/10 to-transparent -z-10" />
+                            <div className="flex flex-col gap-0.5">
+                                <div className="flex gap-1">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i} className="w-1.5 h-3 rounded-sm bg-selam-cyan/70" style={{ animationDelay: `${i * 0.3}s`, animation: 'node-blink 1.5s ease-in-out infinite' }} />
+                                    ))}
+                                </div>
                             </div>
+                            <p className="text-white font-medium whitespace-nowrap tracking-wide">HIPAA-Compliant Storage</p>
+                        </div>
+                    </div>
+
+                    {/* Feature 4: AI Diagnostics Engine — top-left near roof/cross */}
+                    <div className="absolute top-[10%] left-[4%] md:left-[8%] tooltip tooltip-ai z-40">
+                        <div className="glass-panel px-6 py-4 flex items-center gap-4 relative isolate overflow-hidden bg-slate-900/60 backdrop-blur-lg border border-selam-cyan/30 rounded-xl shadow-2xl">
+                            <div className="absolute inset-0 bg-gradient-to-r from-selam-cyan/10 to-transparent -z-10" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-selam-cyan shadow-[0_0_10px_rgba(0,220,255,0.8)]" style={{ animation: 'node-blink 0.8s ease-in-out infinite' }} />
+                            <p className="text-white font-medium whitespace-nowrap tracking-wide">AI Diagnostics Engine</p>
                         </div>
                     </div>
                 </div>
