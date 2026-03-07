@@ -8,45 +8,62 @@ export function Section3() {
 
     useEffect(() => {
         let ctx = gsap.context(() => {
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top top',
-                    end: '+=400%',
-                    scrub: 1,
-                }
-            });
+            // Animate Center Text first (coming down)─────────────────────────────────────
+            // Removed curtain wiping. Handled natively in App.tsx by moving DOM.
 
             gsap.set(".connect-text > *", { opacity: 0, y: -30 });
             gsap.set(".feature-card", { opacity: 0, scale: 0.5, y: 50 });
-
-            // Animate Center Text first (coming down)
-            tl.to(".connect-text > *", {
-                opacity: 1,
-                y: 0,
-                stagger: 0.2,
-                duration: 1,
-                ease: 'power2.out'
-            }, 0.1) // Early in section
-
-                // Feature cards spring up around 60% of the timeline (approx 2.4 out of 4)
-                .to(".feature-card", {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    stagger: 0.3,
-                    duration: 1.5,
-                    ease: "elastic.out(1, 0.7)"
-                }, 2.4);
 
         }, containerRef);
 
         return () => ctx.revert();
     }, []);
 
+    // This callback is called from CanvasSequence with the main timeline
+    // so we can inject our custom page-turn transition at the very beginning!
+    const handleMainTimeline = (tl: gsap.core.Timeline) => {
+        // ── TRUE PAGE TURN ENTRANCE ─────────────────────────────────────
+        // Section 3 starts totally clipped out (inset from the right 100%).
+        // In the first 15% of the scroll timeline, it wipes in to inset 0%.
+        // Because Section 3 is already pinned natively by CanvasSequence,
+        // this clipPath wipe happens over Section 2's final resting position.
+        gsap.set(containerRef.current, { clipPath: 'inset(0 100% 0 0)' });
+
+        tl.to(containerRef.current, {
+            clipPath: 'inset(0 0% 0 0)',
+            ease: 'power2.inOut',
+            duration: 0.15,
+        }, 0);
+
+        // Text animations start right after the wipe (at 0.15)
+        tl.to(".connect-text > *", {
+            opacity: 1,
+            y: 0,
+            stagger: 0.2,
+            duration: 1,
+            ease: 'power2.out'
+        }, 0.15)
+            // Feature cards spring up
+            .to(".feature-card", {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                stagger: 0.2,
+                duration: 0.8,
+                ease: 'back.out(1.5)'
+            }, 0.50);
+    };
+
     return (
-        <section ref={containerRef} className="w-full">
-            <CanvasSequence folder="section 3" frameCount={120} id="section-3">
+        // -mt-[100vh] pulls Section 3 up so it physically sits EXACTLY on top of Section 2's end state
+        // This is what allows the clipPath wipe to reveal Section 2 underneath!
+        <section ref={containerRef} className="w-full relative z-[100] -mt-[100vh]">
+            <CanvasSequence
+                folder="section 3"
+                frameCount={120}
+                id="section-3"
+                additionalTlCallback={handleMainTimeline}
+            >
                 <div className="w-full h-full relative pointer-events-none flex flex-col items-center justify-between py-24 z-20">
 
                     <div className="connect-text text-center px-4 max-w-3xl">

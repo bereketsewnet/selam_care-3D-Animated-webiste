@@ -94,10 +94,10 @@ export function Section2() {
             }, 0.30);
 
             // 70% to 100% Scroll: Floating Feature points fade in next to glowing parts
-            tl.to('.tooltip-server', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.70);
-            tl.to('.tooltip-doctors', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.75);
-            tl.to('.tooltip-storage', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.80);
-            tl.to('.tooltip-ai', { opacity: 1, y: 0, duration: 0.15, ease: 'back.out(2)' }, 0.85);
+            tl.to('.tooltip-server', { opacity: 1, y: 0, duration: 0.10, ease: 'back.out(2)' }, 0.70);
+            tl.to('.tooltip-doctors', { opacity: 1, y: 0, duration: 0.10, ease: 'back.out(2)' }, 0.75);
+            tl.to('.tooltip-storage', { opacity: 1, y: 0, duration: 0.10, ease: 'back.out(2)' }, 0.80);
+            tl.to('.tooltip-ai', { opacity: 1, y: 0, duration: 0.10, ease: 'back.out(2)' }, 0.85);
 
         }, sectionRef);
 

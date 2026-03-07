@@ -12,7 +12,8 @@ interface CanvasSequenceProps {
     end?: string;
     scrub?: number | boolean;
     sequenceEndRatio?: number;
-    sequenceStartRatio?: number; // dead time at the START before frames begin
+    sequenceStartRatio?: number;
+    additionalTlCallback?: (tl: gsap.core.Timeline) => void;
 }
 
 export function CanvasSequence({
@@ -24,6 +25,7 @@ export function CanvasSequence({
     scrub = 0.5,
     sequenceEndRatio = 1,
     sequenceStartRatio = 0,
+    additionalTlCallback,
 }: CanvasSequenceProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -69,8 +71,11 @@ export function CanvasSequence({
             frames.push(img);
         }
 
+        let mainTlRef: { current: gsap.core.Timeline | null } = { current: null };
+
         let ctx = gsap.context(() => {
             const tl = gsap.timeline({
+                id: 'mainTimeline',
                 scrollTrigger: {
                     trigger: container,
                     start: 'top top',
@@ -99,6 +104,8 @@ export function CanvasSequence({
             if (sequenceEndRatio < 1) {
                 tl.to({}, { duration: 1 - sequenceEndRatio - sequenceStartRatio });
             }
+
+            mainTlRef.current = tl;
         });
 
         const handleResize = () => {
@@ -117,7 +124,6 @@ export function CanvasSequence({
             gsap.to(canvas, {
                 x: xPos,
                 y: yPos,
-                rotationY: xPos * 0.1,
                 rotationX: -yPos * 0.1,
                 ease: "power2.out",
                 duration: 1
@@ -127,12 +133,17 @@ export function CanvasSequence({
         window.addEventListener('resize', handleResize);
         window.addEventListener('mousemove', handleMouseMove);
 
+        // Allow parent to inject custom animations
+        if (additionalTlCallback && mainTlRef.current) {
+            additionalTlCallback(mainTlRef.current);
+        }
+
         return () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('mousemove', handleMouseMove);
             ctx.revert();
         };
-    }, [folder, frameCount, end, scrub, sequenceEndRatio]);
+    }, [folder, frameCount, end, scrub, sequenceEndRatio, sequenceStartRatio, additionalTlCallback]);
 
     return (
         <div id={id} ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#0a0a0a] perspective-[1000px]">
