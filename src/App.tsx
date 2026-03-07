@@ -3,6 +3,7 @@ import { Section1 } from './components/sections/Section1';
 import { Section2 } from './components/sections/Section2';
 import { Section3 } from './components/sections/Section3';
 import { Section4 } from './components/sections/Section4';
+import { IrisTransition } from './components/IrisTransition';
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
       <Header />
       <Section1 />
       <Section2 />
+      <IrisTransition />
       <Section3 />
       <Section4 />
 

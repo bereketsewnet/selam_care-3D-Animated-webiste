@@ -14,6 +14,7 @@ interface CanvasSequenceProps {
     sequenceEndRatio?: number;
     sequenceStartRatio?: number;
     additionalTlCallback?: (tl: gsap.core.Timeline) => void;
+    backgroundNode?: React.ReactNode;
 }
 
 export function CanvasSequence({
@@ -26,6 +27,7 @@ export function CanvasSequence({
     sequenceEndRatio = 1,
     sequenceStartRatio = 0,
     additionalTlCallback,
+    backgroundNode,
 }: CanvasSequenceProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -38,9 +40,14 @@ export function CanvasSequence({
         if (!canvas || !context || !container) return;
 
         const frames: HTMLImageElement[] = [];
-        const animation = { frame: 0 };
+        const animation = { frame: sequenceStartRatio > 0 ? -1 : 0 };
 
         const render = (index: number) => {
+            // Skip rendering during dead zone (frame = -1 sentinel)
+            if (index < 0) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
             if (!frames[index] || !frames[index].complete) return;
             const img = frames[index];
 
@@ -64,7 +71,11 @@ export function CanvasSequence({
                     setTimeout(() => {
                         canvas.width = window.innerWidth;
                         canvas.height = window.innerHeight;
-                        render(0);
+                        // Only pre-render frame 0 if there is no dead zone;
+                        // otherwise leave canvas blank (dark bg shows through)
+                        if (sequenceStartRatio === 0) {
+                            render(0);
+                        }
                     }, 0);
                 }
             };
@@ -91,13 +102,17 @@ export function CanvasSequence({
             }
 
             // The frames animate over a fraction of the total pin distance
-            tl.to(animation, {
-                frame: frameCount - 1,
-                snap: 'frame',
-                ease: 'none',
-                duration: sequenceEndRatio,
-                onUpdate: () => render(Math.round(animation.frame))
-            });
+            // Use fromTo so it firmly starts at 0 instead of interpolating from -1
+            tl.fromTo(animation,
+                { frame: 0 },
+                {
+                    frame: frameCount - 1,
+                    snap: 'frame',
+                    ease: 'none',
+                    duration: sequenceEndRatio,
+                    onUpdate: () => render(Math.round(animation.frame))
+                }
+            );
 
             // If sequenceEndRatio is less than 1, add dead space at the end 
             // so the section stays pinned while the frame stays on the last one.
@@ -147,12 +162,22 @@ export function CanvasSequence({
 
     return (
         <div id={id} ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#0a0a0a] perspective-[1000px]">
-            <canvas
-                ref={canvasRef}
-                className="absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%] object-cover z-10 origin-center"
-            />
-            <div className="absolute inset-0 z-20">
-                {children}
+            {/* Background Node (statically stays behind the wipe) */}
+            {backgroundNode && (
+                <div className="absolute inset-0 z-0">
+                    {backgroundNode}
+                </div>
+            )}
+
+            {/* The actual canvas sequence and its children, wrapped for wiping */}
+            <div className="wipe-container absolute inset-0 z-10 w-full h-full">
+                <canvas
+                    ref={canvasRef}
+                    className="absolute inset-0 w-[105%] h-[105%] -left-[2.5%] -top-[2.5%] object-cover z-10 origin-center"
+                />
+                <div className="absolute inset-0 z-20">
+                    {children}
+                </div>
             </div>
         </div>
     );
