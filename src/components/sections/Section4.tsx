@@ -73,8 +73,8 @@ export function Section4() {
 
                             {/* Title appearing above the metrics */}
                             <div className="absolute top-12 left-12 z-30 pointer-events-auto">
-                                <h3 className="text-4xl font-bold tracking-tight text-white mb-2">Selam Workspace</h3>
-                                <p className="text-selam-cyan/80 font-medium tracking-wider uppercase text-sm">Full System Access</p>
+                                <h3 className="font-display text-4xl lg:text-5xl font-bold tracking-tight text-white mb-2 leading-none">Selam Workspace</h3>
+                                <p className="text-sm font-bold uppercase tracking-[0.2em] text-selam-cyan">Full System Access</p>
                             </div>
 
                         </div>

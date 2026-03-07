@@ -50,13 +50,13 @@ export function Section3() {
                 <div className="w-full h-full relative pointer-events-none flex flex-col items-center justify-between py-24 z-20">
 
                     <div className="connect-text text-center px-4 max-w-3xl">
-                        <p className="text-selam-cyan uppercase tracking-[0.2em] font-bold mb-4">
+                        <p className="text-sm font-bold uppercase tracking-[0.2em] text-selam-cyan mb-4">
                             Zero Latency. Total Connection.
                         </p>
-                        <h2 className="text-5xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-lg">
+                        <h2 className="font-display text-5xl md:text-6xl font-bold tracking-tight leading-none text-white mb-6 drop-shadow-lg">
                             Care without boundaries.
                         </h2>
-                        <p className="text-lg text-slate-300 font-light leading-relaxed mx-auto max-w-2xl">
+                        <p className="text-lg md:text-xl font-normal leading-relaxed text-slate-300 mx-auto max-w-xl mb-10">
                             Crystal-clear video conferencing and secure, instant chat built natively into your workflow. No third-party apps required—just seamless doctor-patient communication.
                         </p>
                     </div>
@@ -68,8 +68,8 @@ export function Section3() {
                             <div className="w-14 h-14 rounded-full bg-selam-cyan/20 flex items-center justify-center mb-6 border border-selam-cyan/50">
                                 <Video className="text-selam-cyan" size={28} />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-3">HD Virtual Consultations</h3>
-                            <p className="text-slate-400 font-light leading-relaxed">
+                            <h3 className="font-display text-2xl font-bold text-white mb-3 tracking-tight">HD Virtual Consultations</h3>
+                            <p className="text-slate-400 font-normal leading-relaxed">
                                 Meet patients face-to-face in high definition with completely integrated telemedicine endpoints.
                             </p>
                         </div>
@@ -78,8 +78,8 @@ export function Section3() {
                             <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center mb-6 border border-blue-500/50">
                                 <MessageSquare className="text-blue-400" size={28} />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-3">Secure Instant Messaging</h3>
-                            <p className="text-slate-400 font-light leading-relaxed">
+                            <h3 className="font-display text-2xl font-bold text-white mb-3 tracking-tight">Secure Instant Messaging</h3>
+                            <p className="text-slate-400 font-normal leading-relaxed">
                                 Encrypted chatting for rapid follow-ups, prescriptions, and health check-ins seamlessly delivered.
                             </p>
                         </div>

@@ -81,7 +81,48 @@ export function Section2() {
 
         }, sectionRef);
 
-        return () => ctx.revert();
+        // ── HEADER UNIFIED TIMELINE ────────────────────────────
+        // One timeline spanning the full Section 2 scroll (400% viewport).
+        // Timeline total duration = 4 units → each unit = 100% of viewport scroll.
+        // Phase 1 (0–0.5): black glass, logo hides   ← white building visible
+        // Phase 2 (2.4–3.2): white glass, logo shows ← inside building visible
+        const headerTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: '#section-2',
+                start: 'top top',
+                end: '+=400%',
+                scrub: 1.5,
+            }
+        });
+
+        // ── Phase 1: black glass appears as beam sweeps (first ~12% of scroll)
+        headerTl
+            .to('.header-ui-box', {
+                backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                borderColor: 'rgba(255, 255, 255, 0.15)',
+                ease: 'power1.inOut',
+                duration: 0.5,
+            }, 0)
+            .to('.logo-text-reveal', { width: 0, opacity: 0, ease: 'power2.inOut', duration: 0.5 }, 0)
+
+            // ── Hold black glass from 0.5 → 2.4 (nothing changes during building footage)
+            .to({}, { duration: 1.9 }, 0.5)   // empty tween = hold
+
+            // ── Phase 2: white glass when inside building appears (~45% through scroll)
+            .to('.header-ui-box', {
+                backgroundColor: 'rgba(255, 255, 255, 0.10)',
+                borderColor: 'rgba(255, 255, 255, 0.20)',
+                ease: 'power1.inOut',
+                duration: 0.8,
+            }, 1.8)
+            .to('.logo-text-reveal', { width: 130, opacity: 1, ease: 'power2.inOut', duration: 0.8 }, 1.8);
+
+        return () => {
+            ctx.revert();
+            headerTl.scrollTrigger?.kill();
+            gsap.set('.header-ui-box', { clearProps: 'backgroundColor,borderColor' });
+            gsap.set('.logo-text-reveal', { clearProps: 'width,opacity' });
+        };
     }, []);
 
     return (
@@ -98,8 +139,8 @@ export function Section2() {
                 {/* ── SECTION CONTENT ─────────────────────────────── */}
                 <div className="w-full h-full relative pointer-events-none">
                     <div className="absolute top-32 left-8 md:left-24 section-title z-20">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">The Infrastructure</h2>
-                        <p className="text-xl text-selam-cyan font-light tracking-wide">The backbone of modern clinics.</p>
+                        <h2 className="font-display text-5xl md:text-6xl font-bold tracking-tight leading-none text-white mb-6">The Infrastructure</h2>
+                        <p className="text-lg md:text-xl font-normal leading-relaxed text-selam-cyan max-w-xl">The backbone of modern clinics.</p>
                     </div>
                     <div className="absolute top-[50%] left-[10%] md:left-[25%] tooltip tooltip-server z-20">
                         <div className="glass-panel px-6 py-4 flex items-center gap-4 relative isolate overflow-hidden">

@@ -191,24 +191,24 @@ export function Section1() {
                 </div>
 
                 <div className="absolute top-0 right-0 w-[30%] h-full flex flex-col justify-center items-center px-6 lg:px-12 pointer-events-none z-30">
-                    <div className="cross-reveal-content text-left w-full max-w-sm xl:max-w-md space-y-6">
+                    <div className="cross-reveal-content text-left w-full max-w-sm xl:max-w-md">
                         {/* Kicker */}
-                        <p className="text-selam-cyan uppercase tracking-[0.25em] text-xs font-bold">
+                        <p className="text-sm font-bold uppercase tracking-[0.2em] text-selam-cyan mb-4">
                             The Next Evolution in Care
                         </p>
 
                         {/* Main headline — large, bold, edge-to-edge of the right column */}
-                        <h2 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tighter mb-8">
+                        <h2 className="font-display text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1] text-white mb-8">
                             The Center<br />
                             of Modern<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-selam-cyan to-white">Healthcare.</span>
                         </h2>
 
                         {/* Thin horizontal rule — editorial style separator */}
-                        <div className="w-12 h-px bg-selam-cyan/60" />
+                        <div className="w-12 h-px bg-selam-cyan/60 mb-6" />
 
                         {/* Body text */}
-                        <p className="text-slate-300 text-sm md:text-base font-light leading-relaxed max-w-xs">
+                        <p className="text-lg md:text-xl font-normal leading-relaxed text-slate-300 max-w-xl mb-8">
                             Unifying patient records, real-time telehealth, and intelligent diagnostics — all in one trusted, beautiful platform.
                         </p>
 
@@ -225,16 +225,16 @@ export function Section1() {
                     {/* Removed vignette bg, natural contrast utilized by globe shifting right */}
                     <div className="max-w-xl genesis-text pointer-events-none mt-10 lg:mt-0">
 
-                        <p className="text-selam-cyan uppercase tracking-[0.2em] text-sm md:text-base font-bold mb-4">
+                        <p className="text-sm font-bold uppercase tracking-[0.2em] text-selam-cyan mb-4">
                             Introducing the new standard in care.
                         </p>
 
-                        <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tighter mb-8">
+                        <h1 className="font-display text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1] text-white mb-8">
                             Intelligent Care.<br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-selam-cyan to-white">Real-time Connection.</span>
                         </h1>
 
-                        <p className="text-lg text-slate-300 md:text-xl leading-relaxed mb-12 max-w-lg font-light">
+                        <p className="text-lg md:text-xl font-normal leading-relaxed text-slate-300 max-w-xl mb-12">
                             A completely reimagined ecosystem for doctors and patients. Experience seamless clinic management, integrated video conferencing, and instant chat—all in one beautiful platform.
                         </p>
 
@@ -312,7 +312,7 @@ export function Section1() {
 
                             {/* Content */}
                             <div className="text-left">
-                                <div className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-1 leading-none">
+                                <div className="font-display text-4xl lg:text-5xl font-black text-white tracking-tighter mb-1 leading-none">
                                     10k<span className="text-selam-cyan">+</span>
                                 </div>
                                 <div className="text-[10px] lg:text-xs font-semibold text-slate-300 uppercase tracking-widest leading-relaxed">
