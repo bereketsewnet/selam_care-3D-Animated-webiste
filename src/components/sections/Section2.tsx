@@ -155,6 +155,7 @@ export function Section2() {
                 scrub={2.5}
                 sequenceStartRatio={0.20}
                 sequenceEndRatio={0.80}
+                renderInitialFrame={true}
             >
                 {/* ── SECTION CONTENT ─────────────────────────────── */}
                 <div className="w-full h-full relative pointer-events-none z-50">

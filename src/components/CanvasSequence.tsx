@@ -15,6 +15,7 @@ interface CanvasSequenceProps {
     sequenceStartRatio?: number;
     additionalTlCallback?: (tl: gsap.core.Timeline) => void;
     backgroundNode?: React.ReactNode;
+    renderInitialFrame?: boolean;
 }
 
 export function CanvasSequence({
@@ -28,6 +29,7 @@ export function CanvasSequence({
     sequenceStartRatio = 0,
     additionalTlCallback,
     backgroundNode,
+    renderInitialFrame = false,
 }: CanvasSequenceProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -40,7 +42,7 @@ export function CanvasSequence({
         if (!canvas || !context || !container) return;
 
         const frames: HTMLImageElement[] = [];
-        const animation = { frame: sequenceStartRatio > 0 ? -1 : 0 };
+        const animation = { frame: (sequenceStartRatio > 0 && !renderInitialFrame) ? -1 : 0 };
 
         const render = (index: number) => {
             // Skip rendering during dead zone (frame = -1 sentinel)
@@ -60,23 +62,32 @@ export function CanvasSequence({
         };
 
         // Preload images
-        let loadedCount = 0;
+        let hasInitializedDimensions = false;
+        
         for (let i = 1; i <= frameCount; i++) {
             const img = new Image();
             const indexStr = i.toString().padStart(3, '0');
             img.src = `/${folder}/ezgif-frame-${indexStr}.webp`;
+            
+            const frameIndex = i - 1;
+            
             img.onload = () => {
-                loadedCount++;
-                if (loadedCount === 1) {
+                // Initialize canvas sizes on the very first image that loads (whichever it is)
+                if (!hasInitializedDimensions) {
+                    hasInitializedDimensions = true;
                     setTimeout(() => {
                         canvas.width = window.innerWidth;
                         canvas.height = window.innerHeight;
-                        // Only pre-render frame 0 if there is no dead zone;
-                        // otherwise leave canvas blank (dark bg shows through)
-                        if (sequenceStartRatio === 0) {
+                    }, 0);
+                }
+
+                // Strictly render frame 0 as soon as frame 0 finishes downloading
+                if (frameIndex === 0) {
+                    setTimeout(() => {
+                        if (sequenceStartRatio === 0 || renderInitialFrame) {
                             render(0);
                         }
-                    }, 0);
+                    }, 10); // slight delay to ensure canvas dimensions are applied
                 }
             };
             frames.push(img);
