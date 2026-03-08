@@ -5,19 +5,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * VaultTransition — 3D Glass Vault Doors.
+ * VaultTransition — 3-Phase 3D Glass Vault Doors.
  *
- * Exactly mirrors IrisTransition's architecture:
- * - Fixed overlay, visibility: hidden initially
- * - 350ms timer to read Section 3's end position
- * - ScrollTrigger.create with onUpdate drives visibility + animation progress
- * - Bidirectional: works correctly in both forward and reverse scroll
+ * Phase 1 (0→40%): Left door slides in from left, right door from right → meet at center.
+ * Phase 2 (40→55%): Doors closed. Laser drops down & flares at the seam.
+ * Phase 3 (55→100%): Doors swing backward in 3D (rotateY) to reveal Section 4.
  *
- * Visual flow (0→100% progress):
- *   0→25%  : Laser drops down the center
- *   25→35% : Laser flares (cracks the glass)
- *   35→100%: Left door swings left in 3D, right door swings right in 3D
- *            Laser fades out as doors open
+ * Fully bidirectional — each phase reverses perfectly when scrolling back up.
  */
 export function VaultTransition() {
     const overlayRef = useRef<HTMLDivElement>(null);
@@ -26,36 +20,35 @@ export function VaultTransition() {
         const overlay = overlayRef.current;
         if (!overlay) return;
 
-        // Hide initially
+        // Hidden by default
         overlay.style.visibility = 'hidden';
 
-        const laserEl = overlay.querySelector('.vault-laser') as HTMLElement;
-        const leftDoor = overlay.querySelector('.vault-door-left') as HTMLElement;
+        const laserEl   = overlay.querySelector('.vault-laser')     as HTMLElement;
+        const leftDoor  = overlay.querySelector('.vault-door-left') as HTMLElement;
         const rightDoor = overlay.querySelector('.vault-door-right') as HTMLElement;
 
         if (!laserEl || !leftDoor || !rightDoor) return;
 
-        // Hard reset door states
-        gsap.set(laserEl, { height: '0%', opacity: 0, width: '2px', boxShadow: '0 0 30px 5px rgba(6,182,212,0.8)' });
-        gsap.set(leftDoor,  { rotationY: 0, scale: 1, transformOrigin: 'left center' });
-        gsap.set(rightDoor, { rotationY: 0, scale: 1, transformOrigin: 'right center' });
+        /* ----- Hard reset to start-of-phase-1 position ----- */
+        gsap.set(laserEl,   { height: '0%', opacity: 0, width: '2px' });
+        // Doors begin fully off-screen; transform-origin for 3D swing phase is set here
+        gsap.set(leftDoor,  { xPercent: -100, rotationY: 0, scale: 1, transformOrigin: 'left center' });
+        gsap.set(rightDoor, { xPercent:  100, rotationY: 0, scale: 1, transformOrigin: 'right center' });
 
         const timer = setTimeout(() => {
             ScrollTrigger.refresh();
 
-            // Section 3's CanvasSequence creates the ScrollTrigger with trigger id = 'section-3'
-            // IrisTransition finds section2 the same way, using vars.trigger.id
             const section3ST = ScrollTrigger.getAll().find(st =>
                 st.vars?.trigger && (st.vars.trigger as Element).id === 'section-3'
             );
 
             if (!section3ST) {
-                console.warn('[VaultTransition] Could not locate Section 3 ScrollTrigger.');
+                console.warn('[VaultTransition] Could not find Section 3 ScrollTrigger.');
                 return;
             }
 
             const start  = section3ST.end;
-            const budget = window.innerHeight * 2.5; // 2.5 viewport heights
+            const budget = window.innerHeight * 3; // 3 viewport-heights for 3-phase
 
             const st = ScrollTrigger.create({
                 start,
@@ -64,48 +57,56 @@ export function VaultTransition() {
                 onUpdate: (self) => {
                     const p = self.progress;
 
-                    // Show/hide with strict bounds — this is the key bidirectional fix
+                    /* --- Visibility gate (strict bounds = bidirectional safety) --- */
                     if (p > 0.005 && p < 0.995) {
                         overlay.style.visibility = 'visible';
                     } else {
                         overlay.style.visibility = 'hidden';
-                        return; // Don't animate when invisible
+                        return;
                     }
 
-                    // --- Phase 1: Laser drops (0 → 25%) ---
-                    if (p <= 0.25) {
-                        const t = p / 0.25; // 0→1
-                        gsap.set(laserEl, {
-                            height: `${t * 100}%`,
-                            opacity: t,
-                            width: '2px',
-                            boxShadow: `0 0 ${30 + t * 20}px ${5 + t * 5}px rgba(6,182,212,${0.5 + t * 0.4})`
-                        });
-                        gsap.set(leftDoor,  { rotationY: 0, scale: 1 });
-                        gsap.set(rightDoor, { rotationY: 0, scale: 1 });
+                    /* ═══ PHASE 1 (0 → 40%): Doors slide in from sides ═══════════ */
+                    if (p <= 0.40) {
+                        const t = p / 0.40; // normalised 0→1
+                        // Smooth ease-in-out deceleration as they meet
+                        const eased = t < 0.5
+                            ? 2 * t * t
+                            : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-                    // --- Phase 2: Laser flares (25% → 35%) ---
-                    } else if (p <= 0.35) {
-                        const t = (p - 0.25) / 0.10; // 0→1
-                        gsap.set(laserEl, {
-                            height: '100%',
-                            opacity: 1,
-                            width:  `${2 + t * 2}px`,
-                            boxShadow: `0 0 ${50 + t * 80}px ${10 + t * 25}px rgba(6,182,212,${0.8 + t * 0.2})`
-                        });
-                        gsap.set(leftDoor,  { rotationY: 0, scale: 1 });
-                        gsap.set(rightDoor, { rotationY: 0, scale: 1 });
+                        const xL = -100 + eased * 100; // -100% → 0%
+                        const xR =  100 - eased * 100; //  100% → 0%
 
-                    // --- Phase 3: Doors swing open (35% → 100%) ---
+                        gsap.set(leftDoor,  { xPercent: xL, rotationY: 0, scale: 1 });
+                        gsap.set(rightDoor, { xPercent: xR, rotationY: 0, scale: 1 });
+                        gsap.set(laserEl,   { height: '0%', opacity: 0, width: '2px',
+                            boxShadow: '0 0 30px 5px rgba(6,182,212,0.8)' });
+
+                    /* ═══ PHASE 2 (40% → 55%): Laser drops & flares ══════════════ */
+                    } else if (p <= 0.55) {
+                        const t = (p - 0.40) / 0.15; // 0→1
+
+                        gsap.set(leftDoor,  { xPercent: 0, rotationY: 0, scale: 1 });
+                        gsap.set(rightDoor, { xPercent: 0, rotationY: 0, scale: 1 });
+
+                        const dropT  = Math.min(1, t * 2);      // 0→1 in first 50% of phase
+                        const flareT = Math.max(0, t * 2 - 1);  // 0→1 in second 50% of phase
+                        gsap.set(laserEl, {
+                            height:    `${dropT * 100}%`,
+                            opacity:   dropT,
+                            width:     `${2 + flareT * 3}px`,
+                            boxShadow: `0 0 ${30 + flareT * 100}px ${5 + flareT * 30}px rgba(6,182,212,${0.6 + flareT * 0.4})`
+                        });
+
+                    /* ═══ PHASE 3 (55% → 100%): Doors swing backward in 3D ═══════ */
                     } else {
-                        const t = (p - 0.35) / 0.65; // 0→1
-                        const angle = t * 95; // 0 → 95 degrees
-                        const sc    = 1 - t * 0.1; // 1 → 0.9
-                        const laserOpacity = Math.max(0, 1 - t * 2); // Fades out fast
+                        const t = (p - 0.55) / 0.45; // 0→1
+                        const angle = t * 95;          // 0° → 95°
+                        const sc    = 1 - t * 0.1;    // 1 → 0.9 (subtle depth)
+                        const laserOpacity = Math.max(0, 1 - t * 3); // fades quickly
 
-                        gsap.set(laserEl, { opacity: laserOpacity });
-                        gsap.set(leftDoor,  { rotationY: -angle, scale: sc });
-                        gsap.set(rightDoor, { rotationY:  angle, scale: sc });
+                        gsap.set(leftDoor,  { xPercent: 0, rotationY: -angle, scale: sc });
+                        gsap.set(rightDoor, { xPercent: 0, rotationY:  angle, scale: sc });
+                        gsap.set(laserEl,   { opacity: laserOpacity });
                     }
                 },
             });
@@ -132,7 +133,6 @@ export function VaultTransition() {
                     boxShadow: 'inset -20px 0 60px rgba(6,182,212,0.05)',
                 }}
             >
-                {/* Edge glow strip */}
                 <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-selam-cyan to-transparent opacity-60" />
             </div>
 
@@ -146,7 +146,6 @@ export function VaultTransition() {
                     boxShadow: 'inset 20px 0 60px rgba(6,182,212,0.05)',
                 }}
             >
-                {/* Edge glow strip */}
                 <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-selam-cyan to-transparent opacity-60" />
             </div>
 
