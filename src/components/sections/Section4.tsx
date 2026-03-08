@@ -25,7 +25,7 @@ export function Section4() {
                 scale: 1,
                 duration: 1.5,
                 ease: "power2.out"
-            }, 3.0); // At 3/4 progress through the section's pin
+            }, 3.0);
 
         }, containerRef);
 
