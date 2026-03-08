@@ -55,25 +55,25 @@ export function Section3() {
                 end="+=400%"
                 scrub={2.5}
             >
-                <div className="w-full h-full relative pointer-events-none flex flex-col items-center justify-between py-24 z-20">
+                <div className="w-full h-full relative pointer-events-none flex flex-col items-center justify-between py-12 z-20">
 
                     {/* Text container gets a dark radial gradient and blur to stand out against bright background lines */}
-                    <div className="connect-text text-center px-10 py-6 max-w-4xl relative rounded-[2rem] overflow-hidden border border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-[0_0_80px_rgba(0,0,0,0.5)]">
+                    <div className="connect-text text-center px-6 py-4 max-w-4xl relative rounded-[2rem] overflow-hidden border border-white/5 bg-slate-950/40 backdrop-blur-xl shadow-[0_0_80px_rgba(0,0,0,0.5)]">
                         {/* Inner subtle glow for the text box */}
                         <div className="absolute inset-0 bg-selam-cyan/5 -z-10 rounded-[2rem]"></div>
 
-                        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-selam-cyan/30 bg-selam-cyan/10 backdrop-blur-md mb-8">
+                        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-selam-cyan/30 bg-selam-cyan/10 backdrop-blur-md mb-3">
                             <span className="w-2 h-2 rounded-full bg-selam-cyan animate-pulse shadow-[0_0_10px_2px_rgba(6,182,212,0.8)]"></span>
                             <span className="text-xs md:text-sm font-bold uppercase tracking-[0.25em] text-selam-cyan drop-shadow-md">
                                 Zero Latency. Total Connection.
                             </span>
                         </div>
 
-                        <h2 className="font-display text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[1.05] text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-slate-400 mb-8 drop-shadow-2xl">
+                        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-slate-400 mb-4 drop-shadow-2xl">
                             Care without boundaries.
                         </h2>
 
-                        <p className="text-lg md:text-2xl font-light leading-relaxed text-slate-200 mx-auto max-w-2xl">
+                        <p className="text-sm md:text-base lg:text-lg font-light leading-relaxed text-slate-200 mx-auto max-w-2xl">
                             Crystal-clear video conferencing and <span className="font-medium text-white">secure, instant chat</span> built natively into your workflow. No third-party apps required.
                         </p>
                     </div>

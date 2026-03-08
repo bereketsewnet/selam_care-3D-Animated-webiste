@@ -1,31 +1,43 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CanvasSequence } from '../CanvasSequence';
-import { Database, Activity, Lock, Users } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const PIN_BUDGET = '+=400%'; // Must match CanvasSequence end prop
 
 export function Section4() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        let ctx = gsap.context(() => {
+        const ctx = gsap.context(() => {
+            /* ── Scrub timeline matching the CanvasSequence pin budget ── */
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: 'top top',
-                    end: '+=400%',
+                    end: PIN_BUDGET,
                     scrub: 1,
                 }
             });
 
-            gsap.set(".dashboard-ui", { opacity: 0, scale: 0.95 });
-
-            // Elements fade in at the very end of the animation (when camera is fully pulled back)
-            tl.to(".dashboard-ui", {
+            /* ── Text already starts invisible via CSS (opacity-0 / translate-y-10) ──
+               Fade in during the final 25% of the pin (after video finishes) */
+            tl.to('.s4-text-block', {
                 opacity: 1,
-                scale: 1,
+                y: 0,
                 duration: 1.5,
-                ease: "power2.out"
+                ease: 'power3.out',
             }, 3.0);
+
+            tl.to('.s4-tooltip', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power3.out',
+                stagger: 0.2,
+            }, 3.2);
 
         }, containerRef);
 
@@ -34,70 +46,87 @@ export function Section4() {
 
     return (
         <section ref={containerRef} className="w-full">
-            <CanvasSequence folder="section 4" frameCount={120} id="section-4">
-                <div className="w-full h-full relative pointer-events-none flex items-center justify-center p-4">
+            {/* NOTE: end prop must match PIN_BUDGET above so canvas + overlay stay in sync */}
+            <CanvasSequence folder="section 4" frameCount={120} id="section-4" end={PIN_BUDGET}>
+                {/* Overlay sits above z-10 canvas */}
+                <div className="absolute inset-0 z-20 pointer-events-none">
 
-                    <div className="dashboard-ui absolute inset-0 z-20 flex items-center justify-center">
+                    {/* ══════════ TOOLTIP 1 — Live Patient Analytics (left panel) ══════════ */}
+                    <div
+                        className="s4-tooltip absolute flex items-center gap-3 opacity-0 translate-y-10"
+                        style={{ top: '26%', left: '7%' }}
+                    >
+                        <div className="relative flex-shrink-0">
+                            <span className="block w-3 h-3 rounded-full bg-selam-cyan shadow-[0_0_12px_4px_rgba(6,182,212,0.9)]" />
+                            <span className="absolute inset-0 rounded-full border-2 border-selam-cyan/60 animate-ping" />
+                        </div>
+                        <div className="px-4 py-2 rounded-xl bg-slate-900/85 backdrop-blur-xl border border-selam-cyan/40 shadow-[0_0_20px_rgba(6,182,212,0.2)] pointer-events-auto">
+                            <p className="text-xs font-mono font-bold uppercase tracking-widest text-selam-cyan whitespace-nowrap">
+                                Live Patient Analytics
+                            </p>
+                        </div>
+                    </div>
 
-                        {/* We recreate a mock 'glass wrapper' around where the dashboard video lands */}
-                        <div className="w-full max-w-7xl h-[80vh] rounded-[2.5rem] border border-white/10 bg-slate-950/60 backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.6)] flex flex-col justify-end p-8 md:p-14 relative overflow-hidden">
+                    {/* ══════════ TOOLTIP 2 — Unified Scheduling (center) ══════════ */}
+                    <div
+                        className="s4-tooltip absolute flex items-center gap-3 opacity-0 translate-y-10"
+                        style={{ top: '16%', left: '50%', transform: 'translateX(-50%) translateY(2.5rem)' }}
+                    >
+                        <div className="relative flex-shrink-0">
+                            <span className="block w-3 h-3 rounded-full bg-blue-400 shadow-[0_0_12px_4px_rgba(96,165,250,0.9)]" />
+                            <span className="absolute inset-0 rounded-full border-2 border-blue-400/60 animate-ping" />
+                        </div>
+                        <div className="px-4 py-2 rounded-xl bg-slate-900/85 backdrop-blur-xl border border-blue-400/40 shadow-[0_0_20px_rgba(96,165,250,0.2)] pointer-events-auto">
+                            <p className="text-xs font-mono font-bold uppercase tracking-widest text-blue-300 whitespace-nowrap">
+                                Unified Scheduling
+                            </p>
+                        </div>
+                    </div>
 
-                            {/* Inner subtle glow and gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent pointer-events-none" />
-                            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                    {/* ══════════ TOOLTIP 3 — Billing & Coding Auto-Sync (right panel) ══════════ */}
+                    <div
+                        className="s4-tooltip absolute flex items-center gap-3 opacity-0 translate-y-10"
+                        style={{ top: '26%', right: '7%' }}
+                    >
+                        <div className="px-4 py-2 rounded-xl bg-slate-900/85 backdrop-blur-xl border border-emerald-400/40 shadow-[0_0_20px_rgba(52,211,153,0.2)] pointer-events-auto">
+                            <p className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-300 whitespace-nowrap">
+                                Billing &amp; Coding Auto-Sync
+                            </p>
+                        </div>
+                        <div className="relative flex-shrink-0">
+                            <span className="block w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_12px_4px_rgba(52,211,153,0.9)]" />
+                            <span className="absolute inset-0 rounded-full border-2 border-emerald-400/60 animate-ping" />
+                        </div>
+                    </div>
 
-                            {/* Title appearing above the metrics */}
-                            <div className="absolute top-10 left-10 md:top-14 md:left-14 z-30 pointer-events-auto">
-                                <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-selam-cyan/30 bg-selam-cyan/10 backdrop-blur-md mb-4">
-                                    <span className="w-2 h-2 rounded-full bg-selam-cyan animate-pulse shadow-[0_0_10px_2px_rgba(6,182,212,0.8)]"></span>
-                                    <span className="text-xs font-bold uppercase tracking-[0.25em] text-selam-cyan drop-shadow-md">
-                                        Full System Access
-                                    </span>
-                                </div>
-                                <h3 className="font-display text-5xl lg:text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 leading-[1.1] drop-shadow-2xl">
-                                    Selam Workspace
-                                </h3>
+                    {/* ══════════ MAIN TEXT BLOCK — bottom center frosted glass ══════════ */}
+                    <div
+                        className="s4-text-block absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 opacity-0 translate-y-10 pointer-events-auto"
+                    >
+                        <div className="rounded-[2rem] bg-slate-950/75 backdrop-blur-2xl border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.6)] px-8 py-7 text-center relative overflow-hidden">
+                            {/* Top glow border line */}
+                            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-selam-cyan/40 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 bg-selam-cyan/[0.04] rounded-[2rem] pointer-events-none" />
+
+                            {/* Kicker */}
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-selam-cyan/30 bg-selam-cyan/10 backdrop-blur-md mb-4">
+                                <span className="w-2 h-2 rounded-full bg-selam-cyan animate-pulse shadow-[0_0_8px_2px_rgba(6,182,212,0.8)]" />
+                                <span className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.3em] text-selam-cyan">
+                                    Unprecedented Visibility.
+                                </span>
                             </div>
 
-                            <div className="relative z-30 grid grid-cols-1 md:grid-cols-4 gap-6 pointer-events-auto">
+                            {/* Headline */}
+                            <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-white mb-4 drop-shadow-2xl">
+                                Command your clinic.
+                            </h2>
 
-                                <div className="group p-8 rounded-[2rem] bg-slate-900/50 backdrop-blur-xl border border-white/10 hover:bg-slate-800/60 hover:border-selam-cyan/40 transition-all duration-500 shadow-xl cursor-pointer relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-selam-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-selam-cyan/20 border border-transparent group-hover:border-selam-cyan/30 transition-colors duration-500 shadow-[0_0_20px_rgba(6,182,212,0)] group-hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                                        <Activity className="text-slate-400 group-hover:text-selam-cyan transition-colors" size={26} />
-                                    </div>
-                                    <h4 className="font-display text-2xl font-bold text-white mb-2 tracking-tight">Live Vitals</h4>
-                                    <p className="text-base text-slate-400 font-normal leading-relaxed group-hover:text-slate-300 transition-colors">Real-time patient monitoring</p>
-                                </div>
-
-                                <div className="group p-8 rounded-[2rem] bg-slate-900/50 backdrop-blur-xl border border-white/10 hover:bg-slate-800/60 hover:border-blue-500/40 transition-all duration-500 shadow-xl cursor-pointer relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 border border-transparent group-hover:border-blue-500/30 transition-colors duration-500 shadow-[0_0_20px_rgba(59,130,246,0)] group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                                        <Database className="text-slate-400 group-hover:text-blue-400 transition-colors" size={26} />
-                                    </div>
-                                    <h4 className="font-display text-2xl font-bold text-white mb-2 tracking-tight">Central Records</h4>
-                                    <p className="text-base text-slate-400 font-normal leading-relaxed group-hover:text-slate-300 transition-colors">Unified patient history</p>
-                                </div>
-
-                                <div className="group p-8 rounded-[2rem] bg-slate-900/50 backdrop-blur-xl border border-white/10 hover:bg-slate-800/60 hover:border-purple-500/40 transition-all duration-500 shadow-xl cursor-pointer relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 border border-transparent group-hover:border-purple-500/30 transition-colors duration-500 shadow-[0_0_20px_rgba(168,85,247,0)] group-hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-                                        <Users className="text-slate-400 group-hover:text-purple-400 transition-colors" size={26} />
-                                    </div>
-                                    <h4 className="font-display text-2xl font-bold text-white mb-2 tracking-tight">Care Teams</h4>
-                                    <p className="text-base text-slate-400 font-normal leading-relaxed group-hover:text-slate-300 transition-colors">Collaborative diagnostics</p>
-                                </div>
-
-                                <div className="group p-8 rounded-[2rem] bg-slate-900/50 backdrop-blur-xl border border-white/10 hover:bg-slate-800/60 hover:border-emerald-500/40 transition-all duration-500 shadow-xl cursor-pointer relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 border border-transparent group-hover:border-emerald-500/30 transition-colors duration-500 shadow-[0_0_20px_rgba(16,185,129,0)] group-hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                                        <Lock className="text-slate-400 group-hover:text-emerald-400 transition-colors" size={26} />
-                                    </div>
-                                    <h4 className="font-display text-2xl font-bold text-white mb-2 tracking-tight">HIPAA Secure</h4>
-                                    <p className="text-base text-slate-400 font-normal leading-relaxed group-hover:text-slate-300 transition-colors">End-to-end encryption</p>
-                                </div>
-
-                            </div>
+                            {/* Sub-headline */}
+                            <p className="text-sm md:text-base font-light leading-relaxed text-slate-300 mx-auto max-w-xl">
+                                Say goodbye to fragmented tools. We completely overhauled the clinic experience into{' '}
+                                <span className="font-medium text-white">one unified, glassmorphic dashboard</span>.
+                                {' '}Patient vitals, scheduling, and billing—all in a single, lightning-fast interface.
+                            </p>
                         </div>
                     </div>
 
