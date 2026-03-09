@@ -72,7 +72,7 @@ export function SectionTransition() {
             }, 0.3);
             tl.to(particles, {
                 xPercent: (i) => (i % 2 === 0 ? -120 : 120) * (0.5 + Math.random()),
-                yPercent: (i) => -60 - Math.random() * 120,
+                yPercent: () => -60 - Math.random() * 120,
                 opacity: 0,
                 scale: 0.3,
                 stagger: 0.01,
