@@ -47,7 +47,7 @@ export function Section3() {
     }, []);
 
     return (
-        <section ref={containerRef} className="w-full">
+        <section id="features" ref={containerRef} className="w-full">
             <CanvasSequence
                 folder="section 3"
                 frameCount={120}

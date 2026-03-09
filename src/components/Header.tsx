@@ -1,12 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { Activity } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export function Header() {
     const headerRef = useRef<HTMLElement>(null);
+    const [activeSection, setActiveSection] = useState('product');
 
     useEffect(() => {
         // Entrance animation — drop down from above
@@ -34,7 +36,34 @@ export function Header() {
 
         }, headerRef);
 
-        return () => ctx.revert();
+        // Active Section Scroll Tracking
+        const updateActiveSection = () => {
+            const scrollY = window.scrollY;
+            const triggers = ScrollTrigger.getAll();
+            
+            let current = 'product'; // default fallback
+            
+            for (const st of triggers) {
+                if (st.vars.trigger) {
+                    const el = st.vars.trigger as HTMLElement;
+                    const id = el.id;
+                    // If we cross the start 'tripwire' of a main section container
+                    if (id && ['product', 'infrastructure', 'features', 'about'].includes(id)) {
+                        if (scrollY >= st.start - 50) { 
+                            current = id; // the deepest section on page wins
+                        }
+                    }
+                }
+            }
+            setActiveSection(current);
+        };
+
+        window.addEventListener('scroll', updateActiveSection, { passive: true });
+
+        return () => {
+            ctx.revert();
+            window.removeEventListener('scroll', updateActiveSection);
+        };
     }, []);
 
     return (
@@ -58,16 +87,66 @@ export function Header() {
 
             {/* Nav pill — stays next to logo, no spacer spreading to edges */}
             <nav className="header-ui-box hidden md:flex flex-shrink-0 items-center gap-6 pointer-events-auto bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-full shadow-lg transition-all duration-300">
-                {['Product', 'Infrastructure', 'Features', 'About'].map((item) => (
-                    <a
-                        key={item}
-                        href={`#${item.toLowerCase()}`}
-                        className="nav-link text-sm font-medium text-slate-300 hover:text-white transition-colors duration-300 relative group"
-                    >
-                        {item}
-                        <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-selam-cyan transition-all duration-300 group-hover:w-full" />
-                    </a>
-                ))}
+                {['Product', 'Infrastructure', 'Features', 'About'].map((item) => {
+                    const targetId = `#${item.toLowerCase()}`;
+                    return (
+                        <a
+                            key={item}
+                            href={targetId}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                
+                                if (item === 'Product') {
+                                    gsap.to(window, { duration: 1.5, scrollTo: { y: 0, offsetY: 0 }, ease: "power3.inOut" });
+                                    return;
+                                }
+
+                                // Find the ScrollTrigger that belongs to the target section
+                                const triggers = ScrollTrigger.getAll();
+                                const sectionTriggers = triggers.filter(st => {
+                                    if (st.vars.trigger) {
+                                        const el = st.vars.trigger as HTMLElement;
+                                        // We added id="infrastructure", id="features", id="about" to the container sections
+                                        return el.id === item.toLowerCase();
+                                    }
+                                    return false;
+                                });
+
+                                // Some sections have multiple triggers (e.g. CanvasSequence pinning VS standard trigger).
+                                // The first one attached to the section container is usually the main pin.
+                                if (sectionTriggers.length > 0) {
+                                    const st = sectionTriggers[0];
+                                    let scrollTarget = st.start;
+                                    
+                                    // Add the transition offsets to leap over the cinematic transitions
+                                    // And also scroll ~95% through the section's pin to show full content
+                                    // Both Features and About use a +=400% budget.
+                                    if (item === 'Features') {
+                                        scrollTarget += (window.innerHeight * 3.8); 
+                                    } else if (item === 'About') {
+                                        scrollTarget += (window.innerHeight * 3.8); 
+                                    }
+
+                                    gsap.to(window, { duration: 1.5, scrollTo: { y: scrollTarget, offsetY: 0 }, ease: "power3.inOut" });
+                                } else {
+                                    // Fallback if ScrollTrigger isn't found
+                                    gsap.to(window, { duration: 1.5, scrollTo: { y: targetId, offsetY: 0 }, ease: "power3.inOut" });
+                                }
+                            }}
+                            className={`nav-link flex flex-col items-center justify-center text-sm font-medium transition-colors duration-300 relative group ${
+                                activeSection === item.toLowerCase() ? 'text-white' : 'text-slate-300 hover:text-white'
+                            }`}
+                        >
+                            {item}
+                            {/* Persistent dot if active */}
+                            <span 
+                                className={`absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-selam-cyan transition-all duration-300 ${
+                                    activeSection === item.toLowerCase() ? 'opacity-100 scale-100 shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'opacity-0 scale-0 group-hover:scale-100 group-hover:opacity-50'
+                                }`} 
+                            />
+                        </a>
+                    );
+                })}
             </nav>
         </header>
     );

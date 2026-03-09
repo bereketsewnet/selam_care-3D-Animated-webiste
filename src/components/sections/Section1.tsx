@@ -157,7 +157,7 @@ export function Section1() {
     }, []);
 
     return (
-        <section ref={containerRef} className="w-full relative overflow-hidden">
+        <section id="product" ref={containerRef} className="w-full relative overflow-hidden">
             <CanvasSequence
                 folder="section 1"
                 frameCount={120}

@@ -146,7 +146,7 @@ export function Section2() {
     }, []);
 
     return (
-        <div ref={sectionRef}>
+        <div id="infrastructure" ref={sectionRef}>
             <CanvasSequence
                 folder="section 2"
                 frameCount={120}

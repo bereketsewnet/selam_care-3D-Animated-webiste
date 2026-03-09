@@ -162,7 +162,7 @@ export function Section4() {
     }, []);
 
     return (
-        <section ref={containerRef} className="w-full">
+        <section id="about" ref={containerRef} className="w-full">
             {/* Inject keyframes */}
             <style>{STYLE}</style>
 
