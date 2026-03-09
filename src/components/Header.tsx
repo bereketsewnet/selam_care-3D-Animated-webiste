@@ -46,7 +46,13 @@ export function Header() {
             for (const st of triggers) {
                 if (st.vars.trigger) {
                     const el = st.vars.trigger as HTMLElement;
-                    const id = el.id;
+                    let id = el.id;
+                    
+                    // Map generic canvas IDs to their section names
+                    if (id === 'section-2' || id === 'infrastructure') id = 'infrastructure';
+                    if (id === 'section-3' || id === 'features') id = 'features';
+                    if (id === 'section-4' || id === 'about') id = 'about';
+
                     // If we cross the start 'tripwire' of a main section container
                     if (id && ['product', 'infrastructure', 'features', 'about'].includes(id)) {
                         if (scrollY >= st.start - 50) { 
@@ -106,8 +112,10 @@ export function Header() {
                                 const sectionTriggers = triggers.filter(st => {
                                     if (st.vars.trigger) {
                                         const el = st.vars.trigger as HTMLElement;
-                                        // We added id="infrastructure", id="features", id="about" to the container sections
-                                        return el.id === item.toLowerCase();
+                                        const id = el.id;
+                                        if (item === 'Infrastructure' && (id === 'section-2' || id === 'infrastructure')) return true;
+                                        if (item === 'Features' && (id === 'section-3' || id === 'features')) return true;
+                                        if (item === 'About' && (id === 'section-4' || id === 'about')) return true;
                                     }
                                     return false;
                                 });
